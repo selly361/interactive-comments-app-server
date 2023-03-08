@@ -1,16 +1,15 @@
-const { createPool } = require("mysql2")
+const { Pool } = require("pg");
 
-const db = createPool({
-    host: process.env.HOST,
-    user: process.env.ROOT,
-    password: process.env.PASSWORD,
-    database: process.env.DATABASE
-  });
-  
+const	options = {
+		connectionString: process.env.DATABASE_URL,
+		ssl: {
+			rejectUnauthorized: false,
+		},
+	};
+const pool = new Pool(options);
 
-  function query(string, params, callback) {
-	return db.query(string, params, callback);
+function query(string, params, callback) {
+	return pool.query(string, params, callback);
 }
 
-
-module.exports = { query }
+module.exports = { query };

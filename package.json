@@ -19,6 +19,6 @@
   },
   "_moduleAliases": {
     "@root": ".",
-    "@db": "./db/db.js"
+    "@db": "./db"
   }
 }
