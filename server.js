@@ -1,6 +1,6 @@
 const express = require("express");
 require("dotenv").config()
-
+require('module-alias/register')
 
 const app = express()
 
