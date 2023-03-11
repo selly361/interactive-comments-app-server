@@ -1,5 +1,5 @@
 /**
-  * Checks whether a given username string is valid. A valid username must:
+  * Checks whether a given username string is valid.
  * 
  * @param {string} username - The username to validate.
  * @returns {boolean} Returns true if the username is valid, false otherwise.
