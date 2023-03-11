@@ -23,6 +23,7 @@
   },
   "_moduleAliases": {
     "@root": ".",
-    "@db": "./db"
+    "@db": "./db/db.js",
+    "@isEmailValid": "utils/isEmailValid.js"
   }
 }
