@@ -1,6 +1,6 @@
 /**
- * Checks whether a given username string is valid.
- *
+  * Checks whether a given username string is valid. A valid username must:
+ * 
  * @param {string} username - The username to validate.
  * @returns {boolean} Returns true if the username is valid, false otherwise.
  *
@@ -11,7 +11,7 @@ const isUsernameValid = (username) => {
      *
      * @type {RegExp}
      */
-    const usernamePattern = /^[a-zA-Z0-9_-]+$/;
+    const usernamePattern = /^[a-zA-Z0-9][a-zA-Z0-9_-]{1,18}[a-zA-Z0-9]$/;
   
     return usernamePattern.test(username);
   };
