@@ -24,6 +24,8 @@
   "_moduleAliases": {
     "@root": ".",
     "@db": "./db/db.js",
-    "@utils": "./utils"
+    "@utils": "./utils",
+    "@middlewares": "./middlewares",
+    "@authControllers": "./controllers/authControllers.js"
   }
 }
