@@ -16,7 +16,9 @@ const isEmailValid = (email) => {
      * @type {RegExp}
     */
     
-    return /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email)
+    const emailPattern = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+    
+    return emailPattern.test(email);
 }
 
 
