@@ -24,6 +24,6 @@
   "_moduleAliases": {
     "@root": ".",
     "@db": "./db/db.js",
-    "@isEmailValid": "utils/isEmailValid.js"
+    "@utils": "./utils"
   }
 }
