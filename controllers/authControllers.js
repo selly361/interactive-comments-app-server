@@ -1,4 +1,3 @@
-const validateInfo = require("@middlewares/validateInfo.js");
 const db = require("@db");
 const isExistingUser = require("@utils/isExistingUser");
 const {
@@ -6,6 +5,7 @@ const {
   generateRefreshToken,
 } = require("@utils/isExistingUser");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
 const registerController = async (req, res) => {
   const { email, username, password } = req.body;
@@ -80,5 +80,33 @@ const loginController = async (req, res) => {
   res.status(200).json({ access_token });
 };
 
+const refreshTokenController = (req, res) => {
+  const refresh_token = req.cookies.refresh_token;
 
-module.exports = { registerController, loginController };
+  if (!refresh_token) {
+    return res.status(401).json({
+      error: "Refresh token not found in request",
+      code: "MISSING_REFRESH_TOKEN",
+    });
+  }
+
+  try {
+    const { user_id } = jwt.verify(
+      refresh_token,
+      process.env.REFRESH_TOKEN_SECRET
+    );
+
+
+    const access_token = generateAccessToken(user_id)
+
+    res.status(200).json({ access_token })
+    
+  } catch (error) {
+    return res.status(401).json({
+      error: "Token is not valid",
+      code: "INVALID_TOKEN",
+    });
+  }
+};
+
+module.exports = { registerController, loginController, refreshTokenController };
