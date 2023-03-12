@@ -28,6 +28,7 @@
     "@db": "./db/db.js",
     "@utils": "./utils",
     "@middlewares": "./middlewares",
-    "@authControllers": "./controllers/authControllers.js"
+    "@authControllers": "./controllers/authControllers.js",
+    "@authRoute": "./routes/authRoutes.js"
   }
 }

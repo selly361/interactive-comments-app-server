@@ -15,7 +15,7 @@ const db = require("@db")
  const isExistingUser = async (username, email) => {
 
     const query = `SELECT * FROM "user"
-                    WHERE username = $1 AND email = $2;
+                    WHERE username = $1 OR email = $2;
     
     `
 

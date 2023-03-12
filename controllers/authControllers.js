@@ -3,7 +3,7 @@ const isExistingUser = require("@utils/isExistingUser");
 const {
   generateAccessToken,
   generateRefreshToken,
-} = require("@utils/isExistingUser");
+} = require("@utils/generateJwt.js");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
@@ -16,9 +16,9 @@ const registerController = async (req, res) => {
       .json({ error: "User Exists", code: "EXISTING_USER" });
   }
 
-  const salt = bcrypt.genSalt(10);
+  const salt = await bcrypt.genSalt(10);
 
-  const hashedPassword = bcrypt.hash(password, salt);
+  const hashedPassword = await bcrypt.hash(password, salt);
 
   let query = `
         INSERT INTO "user" (email, username, password)
@@ -60,7 +60,7 @@ const loginController = async (req, res) => {
 
   const { rows } = await db.query(query, [email, username]);
 
-  const { password: hashedPassword } = rows[0];
+  const { password: hashedPassword, user_id } = rows[0];
 
   if (!bcrypt.compare(password, hashedPassword)) {
     res
@@ -68,16 +68,16 @@ const loginController = async (req, res) => {
       .json({ error: "Incorrect password", code: "INCORRECT_PASSWORD" });
   }
 
-  const access_token = generateAccessToken(newUser.id);
-  const refresh_token = generateRefreshToken(newUser.id);
+  const access_token = generateAccessToken(user_id);
+  const refresh_token = generateRefreshToken(user_id);
 
   res.cookie("refresh_token", refresh_token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production" ? true : false,
-    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    secure: false,
+    maxAge: 7 * 24 * 60 * 60 * 1000, 
   });
 
-  res.status(200).json({ access_token });
+  res.status(200).json({ access_token, refresh_token });
 };
 
 const refreshTokenController = (req, res) => {
