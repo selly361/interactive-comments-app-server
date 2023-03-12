@@ -44,7 +44,6 @@ const registerController = async (req, res) => {
   }
 };
 
-
 const loginController = async (req, res) => {
   const { email, username, password } = req.body;
 
@@ -72,8 +71,14 @@ const loginController = async (req, res) => {
   const access_token = generateAccessToken(newUser.id);
   const refresh_token = generateRefreshToken(newUser.id);
 
-  res.status(200).json({ access_token, refresh_token });
+  res.cookie("refresh_token", refresh_token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production" ? true : false,
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+  });
+
+  res.status(200).json({ access_token });
 };
 
 
-module.exports = { registerController, loginController }
+module.exports = { registerController, loginController };
