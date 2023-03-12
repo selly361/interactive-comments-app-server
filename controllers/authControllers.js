@@ -3,7 +3,7 @@ const isExistingUser = require("@utils/isExistingUser");
 const {
   generateAccessToken,
   generateRefreshToken,
-} = require("@utils/isExistingUser");
+} = require("@utils/generateJwt.js");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
