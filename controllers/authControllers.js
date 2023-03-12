@@ -16,9 +16,9 @@ const registerController = async (req, res) => {
       .json({ error: "User Exists", code: "EXISTING_USER" });
   }
 
-  const salt = bcrypt.genSalt(10);
+  const salt = await bcrypt.genSalt(10);
 
-  const hashedPassword = bcrypt.hash(password, salt);
+  const hashedPassword = await bcrypt.hash(password, salt);
 
   let query = `
         INSERT INTO "user" (email, username, password)
