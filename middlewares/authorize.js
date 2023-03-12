@@ -1,15 +1,17 @@
 const jwt = require("jsonwebtoken");
 
-module.exports =  (req, res, next) => {
-  const token = req.header("jwt_token");
+module.exports = (req, res, next) => {
+  const authHeader = req.headers.authorization.split(" ");
 
-  if (!token) {
+  if (!authHeader.length || !authHeader[0] == "Bearer ") {
     const error = {
       error: "Authorization denied",
       code: "AUTHORIZATION_DENIED",
     };
     return res.status(403).json(error);
   }
+
+  const token = authHeader[1];
 
   try {
     const verify = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
