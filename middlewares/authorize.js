@@ -3,7 +3,7 @@ const jwt = require("jsonwebtoken");
 module.exports = (req, res, next) => {
   const authHeader = req.headers.authorization.split(" ");
 
-  if (!authHeader.length || !authHeader[0] == "Bearer ") {
+  if (!authHeader.length || !authHeader[0] == "Bearer") {
     const error = {
       error: "Authorization denied",
       code: "AUTHORIZATION_DENIED",
