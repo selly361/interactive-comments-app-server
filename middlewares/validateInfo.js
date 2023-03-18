@@ -11,22 +11,10 @@ module.exports = function (req, res, next) {
       .json({ error: "Missing credentials", code: "MISSING_CREDENTIALS" });
   }
 
-    if (!isEmailValid(email)) {
+    if (!isEmailValid(email) || !isUsernameValid(username) || !isUsernameValid(password)) {
       return res
         .status(400)
-        .json({ error: "Invalid email", code: "INVALID_EMAIL" });
-    }
-
-    if (!isUsernameValid(username)) {
-      return res
-        .status(400)
-        .json({ error: "Invalid username", code: "INVALID_USERNAME" });
-    }
-
-    if (!isPasswordValid(password)) {
-      return res
-        .status(400)
-        .json({ error: "Invalid password", code: "INVALID_PASSWORD" });
+        .json({ error: "Invalid credentials", code: "INVALID_CREDENTIALS" });
     }
 
     next()
