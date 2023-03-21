@@ -1,5 +1,5 @@
 const db = require("@db");
-const jdenticon = require('jdenticon');
+const jdenticon = require("jdenticon");
 const isExistingUser = require("@utils/isExistingUser");
 const {
   generateAccessToken,
@@ -24,16 +24,20 @@ const registerController = async (req, res) => {
   let query = `
         INSERT INTO users (email, username, profile_image, password)
         
-        VALUES ($1, $2, $3)
+        VALUES ($1, $2, $3, $4)
         
         RETURNING *;
     `;
 
-    const profileImage = jdenticon.toSvg(username + email, 100);
-      
+  const profileImage = jdenticon.toSvg(username + email, 100);
 
   try {
-    const { rows } = await db.query(query, [email, username, profileImage, hashedPassword]);
+    const { rows } = await db.query(query, [
+      email,
+      username,
+      profileImage,
+      hashedPassword,
+    ]);
 
     if (rows.length === 0) {
       throw new Error("User creation failed");
@@ -58,7 +62,7 @@ const loginController = async (req, res) => {
   }
 
   let query = `
-        SELECT * FROM "user"
+        SELECT * FROM users
         WHERE email = $1 AND username = $2;
     `;
 
@@ -78,7 +82,7 @@ const loginController = async (req, res) => {
   res.cookie("refresh_token", refresh_token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production" ? true : false,
-    maxAge: 7 * 24 * 60 * 60 * 1000
+    maxAge: 7 * 24 * 60 * 60 * 1000,
   });
 
   res.status(200).json({ access_token, refresh_token });
@@ -100,11 +104,9 @@ const refreshTokenController = (req, res) => {
       process.env.REFRESH_TOKEN_SECRET
     );
 
+    const access_token = generateAccessToken(user_id);
 
-    const access_token = generateAccessToken(user_id)
-
-    res.status(200).json({ access_token })
-    
+    res.status(200).json({ access_token });
   } catch (error) {
     return res.status(401).json({
       error: "Token is not valid",
@@ -113,4 +115,8 @@ const refreshTokenController = (req, res) => {
   }
 };
 
-module.exports = { registerController, loginController, refreshTokenController };
+module.exports = {
+  registerController,
+  loginController,
+  refreshTokenController,
+};

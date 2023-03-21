@@ -2,8 +2,8 @@ const db = require("@db")
 
  const isEmailused = async (email) => {
 
-    const query = `SELECT * FROM "user"
-                    WHERE email = $2;
+    const query = `SELECT * FROM users
+                    WHERE email = $1;
     `
 
     const { rows } = await db.query(query, [email])
