@@ -1,4 +1,5 @@
 const db = require("@db");
+const jdenticon = require('jdenticon');
 const isExistingUser = require("@utils/isExistingUser");
 const {
   generateAccessToken,
@@ -21,15 +22,18 @@ const registerController = async (req, res) => {
   const hashedPassword = await bcrypt.hash(password, salt);
 
   let query = `
-        INSERT INTO "user" (email, username, password)
+        INSERT INTO users (email, username, profile_image, password)
         
         VALUES ($1, $2, $3)
         
         RETURNING *;
     `;
 
+    const profileImage = jdenticon.toSvg(username + email, 100);
+      
+
   try {
-    const { rows } = await db.query(query, [email, username, hashedPassword]);
+    const { rows } = await db.query(query, [email, username, profileImage, hashedPassword]);
 
     if (rows.length === 0) {
       throw new Error("User creation failed");
