@@ -1,20 +1,30 @@
-const db = require("@db");
-const jdenticon = require("jdenticon");
-const isExistingUser = require("@utils/isExistingUser");
-const {
-  generateAccessToken,
-  generateRefreshToken,
-} = require("@utils/generateJwt.js");
+const db =            require("@db");
+const jdenticon =     require("jdenticon");
+const isExistingUser = require("@isExistingUser");
+const isUsernameUsed = require("@isUsernameUsed");
+const isEmailUsed =    require("@isEmailUsed");
+
+const { generateAccessToken, generateRefreshToken } = require("@generateJwt");
+
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 const registerController = async (req, res) => {
+  
   const { email, username, password } = req.body;
 
-  if (await isExistingUser(username, email)) {
+  if (await isExistingUser(email, username)) {
     return res
       .status(409)
       .json({ error: "User Exists", code: "EXISTING_USER" });
+  } else if (await isUsernameUsed(username)) {
+    return res
+      .status(409)
+      .json({ error: "Username is already taken", code: "USERNAME_TAKEN" });
+  } else if (await isEmailUsed(email)) {
+    return res
+      .status(409)
+      .json({ error: "Email is already registered", code: "EMAIL_REGISTERED" });
   }
 
   const salt = await bcrypt.genSalt(10);
@@ -55,7 +65,7 @@ const registerController = async (req, res) => {
 const loginController = async (req, res) => {
   const { email, username, password } = req.body;
 
-  if (!(await isExistingUser(username, email))) {
+  if (!(await isExistingUser(email, username))) {
     return res
       .status(409)
       .json({ error: "User Doesn't Exist", code: "INVALID_USER" });

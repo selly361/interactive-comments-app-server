@@ -25,11 +25,17 @@
     "nodemon": "^2.0.21"
   },
   "_moduleAliases": {
-    "@root": ".",
     "@db": "./db/db.js",
-    "@utils": "./utils",
-    "@middlewares": "./middlewares",
     "@authControllers": "./controllers/authControllers.js",
-    "@authRoute": "./routes/authRoutes.js"
+    "@authRoute": "./routes/authRoutes.js",
+    "@generateJwt": "./utils/generateJwt.js",
+    "@isEmailUsed": "./utils/isEmailUsed.js",
+    "@isUsernameUsed": "./utils/isUsernameUsed.js",
+    "@isEmailValid": "./utils/isEmailValid.js",
+    "@isPasswordValid": "./utils/isPasswordValid.js",
+    "@isExistingUser": "./utils/isExistingUser.js",
+    "@isUsernameValid": "./utils/isUsernameValid.js",
+    "@authorizeMW": "./middlewares/authorize.js",
+    "@validateMW": "./middlewares/validateInfo.js"
   }
 }

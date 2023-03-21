@@ -1,5 +1,5 @@
-const isEmailUsed = require("./isEmailUsed.js");
-const isUsernameUsed = require("./isUsernameUsed.js");
+const isEmailUsed = require("@isEmailUsed");
+const isUsernameUsed = require("@isUsernameUsed");
 
 const isExistingUser = async (email, username) => {
   const [emailExists, usernameExists] = await Promise.all([
