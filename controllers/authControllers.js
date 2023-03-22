@@ -1,8 +1,8 @@
-const db =            require("@db");
-const jdenticon =     require("jdenticon");
+const db = require("@db");
+const jdenticon = require("jdenticon");
 const isExistingUser = require("@isExistingUser");
 const isUsernameUsed = require("@isUsernameUsed");
-const isEmailUsed =    require("@isEmailUsed");
+const isEmailUsed = require("@isEmailUsed");
 
 const { generateAccessToken, generateRefreshToken } = require("@generateJwt");
 
@@ -10,18 +10,26 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 const registerController = async (req, res) => {
-  
   const { email, username, password } = req.body;
 
-  if (await isExistingUser(email, username)) {
+  const [userExists, usernamesUsed, emailsUsed] = await Promise.all([isExistingUser(email, username), isUsernameUsed(username), isEmailUsed(email)])
+
+  if (userExists) {
     return res
       .status(409)
       .json({ error: "User Exists", code: "EXISTING_USER" });
-  } else if (await isUsernameUsed(username)) {
+  } 
+  
+  
+  if (usernamesUsed) {
     return res
       .status(409)
       .json({ error: "Username is already taken", code: "USERNAME_TAKEN" });
-  } else if (await isEmailUsed(email)) {
+  } 
+  
+  
+  
+  if (emailsUsed) {
     return res
       .status(409)
       .json({ error: "Email is already registered", code: "EMAIL_REGISTERED" });
@@ -55,7 +63,7 @@ const registerController = async (req, res) => {
 
     res.status(200).json({ message: "User created successfully" });
   } catch (err) {
-    console.error(err);
+
     res
       .status(500)
       .json({ error: "User creation failed", code: "SERVER_ERROR" });
@@ -65,18 +73,23 @@ const registerController = async (req, res) => {
 const loginController = async (req, res) => {
   const { email, username, password } = req.body;
 
-  if (!(await isExistingUser(email, username))) {
+  let query = `
+  
+  SELECT * FROM users
+
+  WHERE email = $1 AND username = $2;
+
+`
+
+  const [userExists, dataFromDB] = await Promise.all([isExistingUser(email, username), db.query(query, [email, username])])
+
+  if (!userExists) {
     return res
       .status(409)
       .json({ error: "User Doesn't Exist", code: "INVALID_USER" });
   }
 
-  let query = `
-        SELECT * FROM users
-        WHERE email = $1 AND username = $2;
-    `;
-
-  const { rows } = await db.query(query, [email, username]);
+  const { rows } = dataFromDB;
 
   const { password: hashedPassword, user_id } = rows[0];
 
