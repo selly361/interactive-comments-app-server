@@ -12,28 +12,17 @@ const jwt = require("jsonwebtoken");
 const registerController = async (req, res) => {
   const { email, username, password } = req.body;
 
-  const [userExists, usernamesUsed, emailsUsed] = await Promise.all([isExistingUser(email, username), isUsernameUsed(username), isEmailUsed(email)])
+  const [userExists, usernamesUsed, emailsUsed] = await Promise.all([
+    isExistingUser(email, username),
+    isUsernameUsed(username),
+    isEmailUsed(email),
+  ]);
 
-  if (userExists) {
-    return res
-      .status(409)
-      .json({ error: "User Exists", code: "EXISTING_USER" });
-  } 
-  
-  
-  if (usernamesUsed) {
-    return res
-      .status(409)
-      .json({ error: "Username is already taken", code: "USERNAME_TAKEN" });
-  } 
-  
-  
-  
-  if (emailsUsed) {
-    return res
-      .status(409)
-      .json({ error: "Email is already registered", code: "EMAIL_REGISTERED" });
-  }
+  if (userExists) return sendError(res, 409, "User Exists", "EXISTING_USER");
+
+  if (usernamesUsed) return sendError(res, 409, "Username is taken", "USERNAME_TAKEN");
+
+  if (emailsUsed) return sendError(res, 409, "Email is taken", "EMAIL_TAKEN");
 
   const salt = await bcrypt.genSalt(10);
 
@@ -63,10 +52,7 @@ const registerController = async (req, res) => {
 
     res.status(200).json({ message: "User created successfully" });
   } catch (err) {
-
-    res
-      .status(500)
-      .json({ error: "User creation failed", code: "SERVER_ERROR" });
+    sendError(res, 500, "User creation failed", "SERVER_ERROR");
   }
 };
 
@@ -79,25 +65,22 @@ const loginController = async (req, res) => {
 
   WHERE email = $1 AND username = $2;
 
-`
+`;
 
-  const [userExists, dataFromDB] = await Promise.all([isExistingUser(email, username), db.query(query, [email, username])])
+  const [userExists, dataFromDB] = await Promise.all([
+    isExistingUser(email, username),
+    db.query(query, [email, username]),
+  ]);
 
-  if (!userExists) {
-    return res
-      .status(409)
-      .json({ error: "User Doesn't Exist", code: "INVALID_USER" });
-  }
+  if (!userExists)
+    return sendError(res, 409, "User Doesn't Exist", "INVALID_USER");
 
   const { rows } = dataFromDB;
 
   const { password: hashedPassword, user_id } = rows[0];
 
-  if (!bcrypt.compare(password, hashedPassword)) {
-    res
-      .status(409)
-      .json({ error: "Incorrect password", code: "INCORRECT_PASSWORD" });
-  }
+  if (!bcrypt.compare(password, hashedPassword))
+    return sendError(res, 409, "Incorrect password", "INCORRECT_PASSWORD");
 
   const access_token = generateAccessToken(user_id);
   const refresh_token = generateRefreshToken(user_id);
@@ -114,12 +97,13 @@ const loginController = async (req, res) => {
 const refreshTokenController = (req, res) => {
   const refresh_token = req.cookies.refresh_token;
 
-  if (!refresh_token) {
-    return res.status(401).json({
-      error: "Refresh token not found in request",
-      code: "MISSING_REFRESH_TOKEN",
-    });
-  }
+  if (!refresh_token)
+    return sendError(
+      res,
+      401,
+      "Refresh token not found in request",
+      "MISSING_REFRESH_TOKEN"
+    );
 
   try {
     const { user_id } = jwt.verify(
@@ -131,10 +115,7 @@ const refreshTokenController = (req, res) => {
 
     res.status(200).json({ access_token });
   } catch (error) {
-    return res.status(401).json({
-      error: "Token is not valid",
-      code: "INVALID_TOKEN",
-    });
+    sendError(res, 401, "Token is not valid", "INVALID_TOKEN");
   }
 };
 
