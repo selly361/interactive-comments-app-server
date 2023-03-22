@@ -2,11 +2,10 @@ require("module-alias/register");
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
-const cookieParser = require("cookie-parser")
+const cookieParser = require("cookie-parser");
 const app = express();
 
-
-app.use(cookieParser())
+app.use(cookieParser());
 app.use(express.json());
 
 app.use(
@@ -16,18 +15,16 @@ app.use(
         ? true
         : process.env.NODE_ENV === "production"
         ? process.env.ORIGIN
-        : false
+        : false,
   })
 );
 
+const authRouter = require("@authRoute");
+const userRouter = require("@userRoute");
 
-const authRouter = require("@authRoute")
-const userRouter = require("@userRoute")
+app.use("/", authRouter);
 
-app.use("/", authRouter)
-
-app.use("/user", userRouter)
-
+app.use("/user", userRouter);
 
 const PORT = process.env.PORT || 3001;
 
