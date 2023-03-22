@@ -22,8 +22,12 @@ app.use(
 
 
 const authRouter = require("@authRoute")
+const userRouter = require("@userRoute")
 
 app.use("/", authRouter)
+
+app.use("/user", userRouter)
+
 
 const PORT = process.env.PORT || 3001;
 
