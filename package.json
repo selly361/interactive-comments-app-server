@@ -27,6 +27,7 @@
   "_moduleAliases": {
     "@db": "./db/db.js",
     "@authControllers": "./controllers/authControllers.js",
+    "@userControllers": "./controllers/authControllers.js",
     "@authRoute": "./routes/authRoutes.js",
     "@userRoute": "./routes/userRoutes.js",
     "@generateJwt": "./utils/generateJwt.js",
