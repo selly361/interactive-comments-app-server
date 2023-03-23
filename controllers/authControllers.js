@@ -57,31 +57,28 @@ const registerController = async (req, res) => {
 };
 
 const loginController = async (req, res) => {
-  const { email, username, password } = req.body;
+  const { email, password } = req.body;
 
   let query = `
   
   SELECT * FROM users
 
-  WHERE email = $1 AND username = $2;
+  WHERE email = $1;
 
 `;
 
-  const [userExists, dataFromDB] = await Promise.all([
-    isExistingUser(email, username),
-    db.query(query, [email, username]),
-  ]);
+  const { rows } = await db.query(query, [email]),
+ 
 
-  if (!userExists)
-    return sendError(res, 409, "User Doesn't Exist", "INVALID_USER");
+  if (!rows.length) return sendError(res, 409, "User Doesn't Exist", "INVALID_USER");
 
-  const { rows } = dataFromDB;
 
   const { password: hashedPassword, user_id } = rows[0];
 
-  if (!bcrypt.compare(password, hashedPassword))
+  if (!bcrypt.compare(password, hashedPassword)){
     return sendError(res, 409, "Incorrect password", "INCORRECT_PASSWORD");
-
+  }
+  
   const access_token = generateAccessToken(user_id);
   const refresh_token = generateRefreshToken(user_id);
 
@@ -91,20 +88,21 @@ const loginController = async (req, res) => {
     maxAge: 7 * 24 * 60 * 60 * 1000,
   });
 
-  res.status(200).json({ access_token, refresh_token });
+  res.status(200).json({ access_token });
 };
 
 const refreshTokenController = (req, res) => {
   const refresh_token = req.cookies.refresh_token;
 
-  if (!refresh_token)
+  if (!refresh_token){
     return sendError(
       res,
       401,
       "Refresh token not found in request",
       "MISSING_REFRESH_TOKEN"
     );
-
+  }
+  
   try {
     const { user_id } = jwt.verify(
       refresh_token,
