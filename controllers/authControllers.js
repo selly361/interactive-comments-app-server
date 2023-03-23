@@ -3,6 +3,7 @@ const jdenticon = require("jdenticon");
 const isExistingUser = require("@isExistingUser");
 const isUsernameUsed = require("@isUsernameUsed");
 const isEmailUsed = require("@isEmailUsed");
+const sendError = require("@sendError");
 
 const { generateAccessToken, generateRefreshToken } = require("@generateJwt");
 
@@ -72,16 +73,16 @@ const loginController = async (req, res) => {
     db.query(query, [email, username]),
   ]);
 
-  if (!userExists)
+  if (!userExists){
     return sendError(res, 409, "User Doesn't Exist", "INVALID_USER");
-
+}
   const { rows } = dataFromDB;
 
   const { password: hashedPassword, user_id } = rows[0];
 
-  if (!bcrypt.compare(password, hashedPassword))
+  if (!bcrypt.compare(password, hashedPassword)){
     return sendError(res, 409, "Incorrect password", "INCORRECT_PASSWORD");
-
+}
   const access_token = generateAccessToken(user_id);
   const refresh_token = generateRefreshToken(user_id);
 
@@ -97,14 +98,14 @@ const loginController = async (req, res) => {
 const refreshTokenController = (req, res) => {
   const refresh_token = req.cookies.refresh_token;
 
-  if (!refresh_token)
+  if (!refresh_token){
     return sendError(
       res,
       401,
       "Refresh token not found in request",
       "MISSING_REFRESH_TOKEN"
     );
-
+}
   try {
     const { user_id } = jwt.verify(
       refresh_token,
