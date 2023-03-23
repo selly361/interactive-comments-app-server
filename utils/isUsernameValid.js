@@ -11,7 +11,7 @@ const isUsernameValid = (username) => {
      *
      * @type {RegExp}
      */
-    const usernamePattern = /^[a-zA-Z0-9][a-zA-Z0-9_-]{1,18}[a-zA-Z0-9]$/;
+    const usernamePattern = /^[A-Za-z]\\w{4,14}$/;
   
     return usernamePattern.test(username);
   };

@@ -79,6 +79,7 @@ const loginController = async (req, res) => {
   if (!bcrypt.compare(password, hashedPassword)){
     return sendError(res, 409, "Incorrect password", "INCORRECT_PASSWORD");
 }
+  
   const access_token = generateAccessToken(user_id);
   const refresh_token = generateRefreshToken(user_id);
 
@@ -88,7 +89,7 @@ const loginController = async (req, res) => {
     maxAge: 7 * 24 * 60 * 60 * 1000,
   });
 
-  res.status(200).json({ access_token, refresh_token });
+  res.status(200).json({ access_token });
 };
 
 const refreshTokenController = (req, res) => {
