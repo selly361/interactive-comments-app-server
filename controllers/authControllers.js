@@ -58,25 +58,21 @@ const registerController = async (req, res) => {
 };
 
 const loginController = async (req, res) => {
-  const { email, username, password } = req.body;
+  const { email, password } = req.body;
 
   let query = `
   
   SELECT * FROM users
 
-  WHERE email = $1 AND username = $2;
+  WHERE email = $1;
 
 `;
 
-  const [userExists, dataFromDB] = await Promise.all([
-    isExistingUser(email, username),
-    db.query(query, [email, username]),
-  ]);
+  const { rows } = await db.query(query, [email])
 
-  if (!userExists){
+  if (!rows.length > 0){
     return sendError(res, 409, "User Doesn't Exist", "INVALID_USER");
 }
-  const { rows } = dataFromDB;
 
   const { password: hashedPassword, user_id } = rows[0];
 

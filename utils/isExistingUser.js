@@ -9,7 +9,7 @@ const isExistingUser = async (email, username) => {
 
   if (emailExists && usernameExists) {
     return true;
-  }
+  } else return false;
 };
 
 module.exports = isExistingUser;
