@@ -1,20 +1,14 @@
 const router = require("express").Router();
 const validateInfo = require("@validateMW");
 const controllers = require("@authControllers");
-const rateLimit = require("express-rate-limit");
-
-const createAccountLimiter = rateLimit({
-	windowMs: 60 * 60 * 1000,
-	max: 5, 
-	message: 'Too many accounts created from this IP, please try again after an hour',
-	standardHeaders: true,
-	legacyHeaders: false, 
-})
+const { createAccountLimiter, loginLimiter, refreshTokenLimiter, verifyAuthLimiter } = require("@rateLimitConfigs");
 
 router.post("/register", [validateInfo, createAccountLimiter], controllers.registerController);
 
-router.post("/login", validateInfo, controllers.loginController);
+router.post("/login", [validateInfo, loginLimiter], controllers.loginController);
 
-router.get("/refresh-token", controllers.refreshTokenController);
+router.get("/refresh-token", [refreshTokenLimiter], controllers.refreshTokenController);
+
+router.post("/verify-auth", [verifyAuthLimiter], controllers.verifyAuth)
 
 module.exports = router;
