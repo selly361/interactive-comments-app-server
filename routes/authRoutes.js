@@ -5,7 +5,7 @@ const { createAccountLimiter, loginLimiter, refreshTokenLimiter, verifyAuthLimit
 
 router.post("/register", [validateInfo, createAccountLimiter], controllers.registerController);
 
-router.post("/login", [validateInfo, loginLimiter], controllers.loginController);
+router.post("/login", [loginLimiter], controllers.loginController);
 
 router.get("/refresh-token", [refreshTokenLimiter], controllers.refreshTokenController);
 
