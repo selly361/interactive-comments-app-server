@@ -1,15 +1,13 @@
-const db = require("@db")
+const db = require('@db')
 
- const isEmailused = async (email) => {
-
-    const query = `SELECT * FROM users
+const isEmailused = async (email) => {
+   const query = `SELECT * FROM users
                     WHERE email = $1;
     `
 
-    const { rows } = await db.query(query, [email])
+   const { rows } = await db.query(query, [email])
 
-    return rows.length > 0;
+   return rows.length > 0
 }
 
-
-module.exports = isEmailused;
+module.exports = isEmailused
