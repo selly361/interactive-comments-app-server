@@ -11,7 +11,11 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 const registerController = async (req, res) => {
-  const { email, username, password } = req.body;
+  let { email, username, password } = req.body;
+  
+  email = email.toLowerCase()
+  username = username.toLowerCase()
+  
 
   const [userExists, usernamesUsed, emailsUsed] = await Promise.all([
     isExistingUser(email, username),
@@ -68,7 +72,7 @@ const loginController = async (req, res) => {
 
 `;
 
-  const { rows } = await db.query(query, [email])
+  const { rows } = await db.query(query, [email.toLowerCase()])
 
   if (!rows.length > 0){
     return sendError(res, 409, "User Doesn't Exist", "INVALID_USER");
