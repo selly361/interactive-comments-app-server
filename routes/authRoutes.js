@@ -7,8 +7,11 @@ router.post("/register", [validateInfo, createAccountLimiter], controllers.regis
 
 router.post("/login", [loginLimiter], controllers.loginController);
 
+router.post("/logout", controllers.logoutController)
+
 router.get("/refresh-token", [refreshTokenLimiter], controllers.refreshTokenController);
 
 router.post("/verify-auth", [verifyAuthLimiter], controllers.verifyAuth)
+
 
 module.exports = router;

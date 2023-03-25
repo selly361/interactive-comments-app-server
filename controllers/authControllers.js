@@ -12,10 +12,9 @@ const jwt = require("jsonwebtoken");
 
 const registerController = async (req, res) => {
   let { email, username, password } = req.body;
-  
-  email = email.toLowerCase()
-  username = username.toLowerCase()
-  
+
+  email = email.toLowerCase();
+  username = username.toLowerCase();
 
   const [userExists, usernamesUsed, emailsUsed] = await Promise.all([
     isExistingUser(email, username),
@@ -25,7 +24,8 @@ const registerController = async (req, res) => {
 
   if (userExists) return sendError(res, 409, "User Exists", "EXISTING_USER");
 
-  if (usernamesUsed) return sendError(res, 409, "Username is taken", "USERNAME_TAKEN");
+  if (usernamesUsed)
+    return sendError(res, 409, "Username is taken", "USERNAME_TAKEN");
 
   if (emailsUsed) return sendError(res, 409, "Email is taken", "EMAIL_TAKEN");
 
@@ -72,18 +72,18 @@ const loginController = async (req, res) => {
 
 `;
 
-  const { rows } = await db.query(query, [email.toLowerCase()])
+  const { rows } = await db.query(query, [email.toLowerCase()]);
 
-  if (!rows.length > 0){
+  if (!rows.length > 0) {
     return sendError(res, 409, "User Doesn't Exist", "INVALID_USER");
-}
+  }
 
   const { password: hashedPassword, user_id } = rows[0];
 
-  if (!bcrypt.compare(password, hashedPassword)){
+  if (!bcrypt.compare(password, hashedPassword)) {
     return sendError(res, 409, "Incorrect password", "INCORRECT_PASSWORD");
-}
-  
+  }
+
   const access_token = generateAccessToken(user_id);
   const refresh_token = generateRefreshToken(user_id);
 
@@ -99,14 +99,14 @@ const loginController = async (req, res) => {
 const refreshTokenController = (req, res) => {
   const refresh_token = req.cookies.refresh_token;
 
-  if (!refresh_token){
+  if (!refresh_token) {
     return sendError(
       res,
       401,
       "Refresh token not found in request",
       "MISSING_REFRESH_TOKEN"
     );
-}
+  }
   try {
     const { user_id } = jwt.verify(
       refresh_token,
@@ -121,18 +121,13 @@ const refreshTokenController = (req, res) => {
   }
 };
 
-
-
 const verifyAuth = async (req, res) => {
   const { access_token } = req.body;
 
   try {
     jwt.verify(access_token, process.env.ACCESS_TOKEN_SECRET);
 
-
-    
     res.status(200).json({ status: "AUTHENTICATED" });
-
   } catch (err) {
     if (err.name === "TokenExpiredError") {
       return sendError(res, 401, "Token expired", "TOKEN_EXPIRED");
@@ -142,10 +137,15 @@ const verifyAuth = async (req, res) => {
   }
 };
 
+  const logoutController = async (req, res) => {
+    res.clearCookie("refresh_token"); 
+    res.status(200).json({ message: "User logged out successfully" });
+  };
 
 module.exports = {
   registerController,
   loginController,
   refreshTokenController,
-  verifyAuth
+  verifyAuth,
+  logoutController
 };
