@@ -41,6 +41,7 @@
       "@isUsernameValid": "./utils/isUsernameValid.js",
       "@authorizeMW": "./middlewares/authorize.js",
       "@validateMW": "./middlewares/validateInfo.js",
-      "@rateLimitConfigs": "./config/rateLimiters/auth"
+      "@rateLimitConfigs": "./config/rateLimiters/auth",
+      "@commentHierarchy": "./utils/commentHierarchy.js"
    }
 }
