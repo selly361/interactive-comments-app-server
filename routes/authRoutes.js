@@ -1,21 +1,16 @@
 const router = require('express').Router()
 const validateInfo = require('@validateMW')
 const controllers = require('@authControllers')
-const {
-   createAccountLimiter,
-   loginLimiter,
-   refreshTokenLimiter,
-   verifyAuthLimiter,
-} = require('@rateLimitConfigs')
+const limiters = require('@rateLimitConfigs')
 
-router.post('/register', [validateInfo, createAccountLimiter], controllers.registerController)
+router.post('/register', [validateInfo, limiters.createAccountLimiter], controllers.registerController)
 
-router.post('/login', [loginLimiter], controllers.loginController)
+router.post('/login', [limiters.loginLimiter], controllers.loginController)
 
 router.post('/logout', controllers.logoutController)
 
-router.get('/refresh-token', [refreshTokenLimiter], controllers.refreshTokenController)
+router.get('/refresh-token', [limiters.refreshTokenLimiter], controllers.refreshTokenController)
 
-router.post('/verify-auth', [verifyAuthLimiter], controllers.verifyAuth)
+router.post('/verify-auth', [limiters.verifyAuthLimiter], controllers.verifyAuth)
 
 module.exports = router
