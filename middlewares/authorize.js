@@ -19,11 +19,9 @@ module.exports = (req, res, next) => {
       req.user_id = user_id
       next()
    } catch (err) {
-      console.error(err)
-      const error = {
-         error: 'Token is not valid',
-         code: 'INVALID_TOKEN',
-      }
-      return res.status(401).json(error)
+         if (err.name === 'TokenExpiredError') {
+           return res.status(401).json({ message: 'Token expired', status: "TOKEN_EXPIRED" });
+         }
+         return res.status(401).json({ message: 'Invalid token', status: "INVALID_TOKEN" });
    }
 }
