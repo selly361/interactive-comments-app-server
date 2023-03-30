@@ -4,6 +4,7 @@ const isExistingUser = require('@isExistingUser')
 const isUsernameUsed = require('@isUsernameUsed')
 const isEmailUsed = require('@isEmailUsed')
 const sendError = require('@sendError')
+const nodemailer = require('nodemailer')
 
 const { generateAccessToken, generateRefreshToken } = require('@generateJwt')
 
@@ -85,6 +86,7 @@ const loginController = async (req, res) => {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production' ? true : false,
       maxAge: 7 * 24 * 60 * 60 * 1000,
+      sameSite: "None",
    })
 
    res.status(200).json({ access_token })
@@ -128,7 +130,84 @@ const logoutController = async (req, res) => {
    res.status(200).json({ message: 'User logged out successfully' })
 }
 
+const forgetPasswordController = async (req, res) => {
+   const { email } = req.body
+
+   let query = `
+    SELECT * FROM users
+    WHERE email = $1;
+  `
+
+   const { rows } = await db.query(query, [email.toLowerCase()])
+
+   if (!rows.length > 0) {
+      return sendError(res, 409, 'incorrect email', 'INCORRECT_EMAIL')
+   }
+
+   const user = rows[0]
+   const token = generateAccessToken(user.user_id)
+
+   try {
+      const transporter = nodemailer.createTransport({
+         host: process.env.SMTP_HOST,
+         port: process.env.SMTP_PORT,
+         secure: process.env.SMTP_SECURE === 'true',
+         auth: {
+            user: process.env.SMTP_USER,
+            pass: process.env.SMTP_PASSWORD,
+         },
+      })
+
+      const mailOptions = {
+        from: process.env.SMTP_FROM_EMAIL,
+        to: email,
+        subject: 'Password reset request',
+        text: `You are receiving this email because a password reset request has been made for your account.
+        Please click the link below to reset your password.
+        ${process.env.APP_URL}/reset-password?token=${token}`,
+        html: `<p>You are receiving this email because a password reset request has been made for your account.
+        Please click the link below to reset your password.</p>
+        <a href="${process.env.APP_URL}/reset-password?token=${token}">Reset password</a>`,
+      }
+
+      await transporter.sendMail(mailOptions)
+
+      res.status(200).json({
+         message: 'Password reset email sent successfully',
+      })
+   } catch (error) {
+      console.error(error)
+      sendError(res, 500, 'Failed to send password reset email', 'SERVER_ERROR')
+   }
+}
+
+const resetPasswordController = async (req, res) => {
+   const { token } = req.params
+   const { password } = req.body
+
+   try {
+      const { user_id } = jwt.verify(token, process.env.RESET_TOKEN_SECRET)
+
+      const salt = await bcrypt.genSalt(10)
+      const hashedPassword = await bcrypt.hash(password, salt)
+
+      const query = `
+        UPDATE users 
+        SET password = $1
+        WHERE user_id = $2;
+     `
+
+      await db.query(query, [hashedPassword, user_id])
+
+      res.status(200).json({ message: 'User password updated successfully' })
+   } catch (error) {
+      sendError(res, 401, 'Token is not valid or expired', 'INVALID_TOKEN')
+   }
+}
+
 module.exports = {
+   resetPasswordController,
+   forgetPasswordController,
    registerController,
    loginController,
    refreshTokenController,
