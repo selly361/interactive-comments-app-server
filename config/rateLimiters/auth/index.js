@@ -32,6 +32,21 @@ const verifyAuthLimiter = rateLimit({
    legacyHeaders: false,
 })
 
+const forgotPasswordLimiter = rateLimit({
+   windowMs: 5 * 60 * 1000, // 5 minutes
+   max: 5,
+   message: 'Too many forgot password requests, please try again later',
+   headers: true,
+ });
+ 
+ const resetPasswordLimiter = rateLimit({
+   windowMs: 5 * 60 * 1000, // 5 minutes
+   max: 5,
+   message: 'Too many reset password requests, please try again later',
+   headers: true,
+ });
+
+
 module.exports = {
    createAccountLimiter,
    loginLimiter,
