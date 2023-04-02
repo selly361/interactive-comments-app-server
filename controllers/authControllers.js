@@ -109,21 +109,6 @@ const refreshTokenController = (req, res) => {
    }
 }
 
-const verifyAuth = async (req, res) => {
-   const { access_token } = req.body
-
-   try {
-      jwt.verify(access_token, process.env.ACCESS_TOKEN_SECRET)
-
-      res.status(200).json({ status: 'AUTHENTICATED' })
-   } catch (err) {
-      if (err.name === 'TokenExpiredError') {
-         return sendError(res, 401, 'Token expired', 'TOKEN_EXPIRED')
-      }
-
-      sendError(res, 401, 'Invalid token', 'INVALID_TOKEN')
-   }
-}
 
 const logoutController = async (req, res) => {
    res.clearCookie('refresh_token')
@@ -211,6 +196,5 @@ module.exports = {
    registerController,
    loginController,
    refreshTokenController,
-   verifyAuth,
    logoutController,
 }
