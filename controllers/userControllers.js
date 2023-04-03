@@ -8,7 +8,7 @@ const userDataController = async (req, res) => {
 
    const { rows } = await db.query(query, [req.user_id])
 
-   res.json({ ...rows[0], code: "SUCCESS" })
+   res.json({ user: rows[0], code: "SUCCESS" })
 }
 
 module.exports = { userDataController }
