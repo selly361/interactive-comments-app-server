@@ -16,6 +16,7 @@ app.use(
             : process.env.NODE_ENV === 'production'
             ? process.env.ORIGIN
             : false,
+      credentials: true
    })
 )
 
