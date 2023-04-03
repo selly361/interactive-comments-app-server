@@ -41,7 +41,7 @@ const registerController = async (req, res) => {
         RETURNING *;
     `
 
-   const profileImage = jdenticon.toSvg(username + email, 100)
+   const profileImage = jdenticon.toSvg(username + email, 30)
 
    try {
       const { rows } = await db.query(query, [email, username, profileImage, hashedPassword])
@@ -58,9 +58,9 @@ const registerController = async (req, res) => {
 
 const loginController = async (req, res) => {
    const { email, password } = req.body
+   
 
    let query = `
-  
   SELECT * FROM users
 
   WHERE email = $1;
@@ -86,7 +86,7 @@ const loginController = async (req, res) => {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production' ? true : false,
       maxAge: 7 * 24 * 60 * 60 * 1000,
-      sameSite: "None",
+      sameSite: 'None',
    })
 
    res.status(200).json({ access_token })
@@ -108,7 +108,6 @@ const refreshTokenController = (req, res) => {
       sendError(res, 401, 'Token is not valid', 'INVALID_TOKEN')
    }
 }
-
 
 const logoutController = async (req, res) => {
    res.clearCookie('refresh_token')
@@ -144,13 +143,13 @@ const forgetPasswordController = async (req, res) => {
       })
 
       const mailOptions = {
-        from: process.env.SMTP_FROM_EMAIL,
-        to: email,
-        subject: 'Password reset request',
-        text: `You are receiving this email because a password reset request has been made for your account.
+         from: process.env.SMTP_FROM_EMAIL,
+         to: email,
+         subject: 'Password reset request',
+         text: `You are receiving this email because a password reset request has been made for your account.
         Please click the link below to reset your password.
         ${process.env.APP_URL}/reset-password?token=${token}`,
-        html: `<p>You are receiving this email because a password reset request has been made for your account.
+         html: `<p>You are receiving this email because a password reset request has been made for your account.
         Please click the link below to reset your password.</p>
         <a href="${process.env.APP_URL}/reset-password?token=${token}">Reset password</a>`,
       }
