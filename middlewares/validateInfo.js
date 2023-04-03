@@ -5,7 +5,7 @@ const isUsernameValid = require('@isUsernameValid')
 module.exports = function (req, res, next) {
    const { email, username, password } = req.body
 
-   if (![email, username, password].every(Boolean)) {
+   if (![email, (username || "Example"), password].every(Boolean)) {
       return res.status(400).json({ error: 'Missing credentials', code: 'MISSING_CREDENTIALS' })
    }
 
