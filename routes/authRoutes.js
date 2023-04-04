@@ -11,5 +11,4 @@ router.post('/logout', controllers.logoutController)
 
 router.get('/refresh-token', [limiters.refreshTokenLimiter], controllers.refreshTokenController)
 
-
 module.exports = router
