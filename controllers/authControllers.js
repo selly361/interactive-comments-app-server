@@ -75,7 +75,9 @@ const loginController = async (req, res) => {
 
    const { password: hashedPassword, user_id } = rows[0]
 
-   if (!bcrypt.compare(password, hashedPassword)) {
+   const isPasswordCorrect = await bcrypt.compare(password, hashedPassword)
+
+   if (!isPasswordCorrect) {
       return sendError(res, 409, 'Incorrect password', 'INCORRECT_PASSWORD')
    }
 
