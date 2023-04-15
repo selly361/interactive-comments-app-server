@@ -2,7 +2,7 @@ const db = require('@db')
 
 const isEmailused = async (email) => {
    const query = `SELECT * FROM users
-                    WHERE email = $1;
+                    WHERE LOWER(email) = LOWER($1);
     `
 
    const { rows } = await db.query(query, [email])
